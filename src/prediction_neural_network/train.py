@@ -1,4 +1,5 @@
 import itertools
+import os
 import traceback
 import random
 
@@ -9,13 +10,14 @@ np.random.seed(42)
 import tensorflow as tf
 
 tf.random.set_seed(42)
+from .build_fit_model import build_fit_model
+from . import config
+from .data_processing import process
+from .plots import one_step_ahead_plot, multi_steps_ahead_plot
+from .prediction import prediction
 
-from neural_network.build_fit_model import build_fit_model
-import neural_network.config as config
-from neural_network.data_processing import process
-from neural_network.plots import one_step_ahead_plot, multi_steps_ahead_plot
-from neural_network.prediction import prediction
-from neural_network.utilities import get_occupancy
+
+# from utilities import get_occupancy
 
 
 def tune_hyperparameters(X_train, X_test, y_train, y_test):
@@ -52,21 +54,17 @@ def print_results(model_list):
             **model_config['testing_metrics']))
 
 
-def save_best_model(model_list, path=None, print_summary=True):
-    if not path:
-        from utilities.init_data_path import get_data_path
-        path = get_data_path()
+def save_best_model(model_list, path, print_summary=True):
     model = model_list[0]['model']
     if print_summary:
         model.summary()
-    model.save(str(path.joinpath('model.h5')))
-    with open(str(path.joinpath('model_architecture.json')), 'w') as json_file:
+    model.save(os.path.join(path, 'model.h5'))
+    with open(os.path.join(path, 'model_architecture.json'), 'w') as json_file:
         json_file.write(model.to_json())
     return model
 
 
-def train(path=None, plot=False):
-    df = get_occupancy(path, config.start_date, config.end_date)[::12]
+def train(df, path, plot=False):
     data, timestamps = process(df, labels=True)
     print('Training set from {} to {}'.format(timestamps[0][0, 0], timestamps[0][-1, 0]))
     print('Testing set from {} to {}'.format(timestamps[1][0, 0], timestamps[1][-1, 0]))

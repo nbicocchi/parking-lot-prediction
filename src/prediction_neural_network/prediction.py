@@ -2,10 +2,10 @@ import numpy as np
 import pandas as pd
 from tensorflow.keras.models import load_model
 
-import neural_network.config as config
-from neural_network.data_processing import process
-from neural_network.plots import unseen_data_plot
-from neural_network.utilities import parking_accuracy, get_occupancy, occupancy_to_free_parking
+from . import config
+from .data_processing import process
+from .plots import unseen_data_plot
+from .utilities import parking_accuracy, occupancy_to_free_parking
 
 
 def prediction(model, X, y=None, print_accuracy=True):

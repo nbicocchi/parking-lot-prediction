@@ -1,8 +1,8 @@
 import argparse
 from pathlib import Path
 
-from neural_network.prediction import predict_last_data
-from neural_network.train import train
+from prediction import predict_last_data
+from train import train
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--path', type=Path, default=None)

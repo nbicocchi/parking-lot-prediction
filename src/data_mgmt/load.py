@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 
 def load_mantova(start_date, end_date):
     df = pd.read_csv('dataset/mantova.csv')
@@ -17,8 +16,7 @@ def load_mantova(start_date, end_date):
     return df
 
 
-def load_birminghan(park):
-    print(park)
+def load_birmingham(park):
     df = pd.read_csv('dataset/birmingham.csv')
 
     #summary = pd.pivot_table(df, index=['SystemCodeNumber'], values='Capacity')
@@ -37,5 +35,8 @@ def load_birminghan(park):
     df.drop(columns='Occupancy', inplace=True)
     df.drop(columns='LastUpdated', inplace=True)
     df.drop(columns='SystemCodeNumber', inplace=True)
-
     return df
+
+
+def get_data():
+    pass

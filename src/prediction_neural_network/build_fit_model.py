@@ -4,8 +4,8 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv1D, Dense, Dropout, Flatten, MaxPooling1D, LSTM
 from tensorflow.keras.callbacks import EarlyStopping
 
-import neural_network.config as config
-from neural_network.utilities import parking_accuracy
+from . import config
+from .utilities import parking_accuracy
 
 
 def build_model(model_hyperparameters):

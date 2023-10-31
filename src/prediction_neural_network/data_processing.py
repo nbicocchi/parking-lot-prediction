@@ -1,7 +1,7 @@
 import numpy as np
 import tensorflow as tf
 
-import neural_network.config as config
+from . import config
 
 
 # split a univariate sequence into samples
@@ -33,6 +33,7 @@ def split_data(df):
 
 def add_weekday_hour(data):
     # DO NOT CHANGE with a def
+    print(data)
     vfunc = lambda x: np.apply_along_axis(lambda l: list(map(lambda t: (t.dayofweek, t.hour), l)), axis=1, arr=x)
     return np.dstack((vfunc(data[:, :, 0]), np.expand_dims(data[:, :, 1], axis=2)))
 

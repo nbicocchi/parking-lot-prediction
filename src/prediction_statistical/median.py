@@ -1,7 +1,6 @@
 import calendar
-
+import os
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 
 
@@ -11,7 +10,7 @@ def get_accuracy(df, error=2):
 
     pivot_train = pd.pivot_table(train_df, columns=[train_df.index.dayofweek, train_df.index.hour],
                                  values='free_slots',
-                                 aggfunc=np.median).transpose()
+                                 aggfunc='median').transpose()
 
     test_df = test_df.resample(rule='1H').mean()
     test_df['lower_bound'] = test_df['free_slots'] - error
@@ -22,13 +21,13 @@ def get_accuracy(df, error=2):
                        (test_df['prediction'] > test_df['lower_bound'])]) / len(test_df)
 
 
-def get_plot(df, error=2):
+def get_plot(df, saving_path, error=2):
     split_idx = int(len(df) * 0.8)
     train_df, test_df = df[:split_idx], df[split_idx:]
 
     # median
     pivot_train = pd.pivot_table(train_df, columns=[train_df.index.weekday, train_df.index.hour], values='free_slots',
-                                 aggfunc=np.median).transpose()
+                                 aggfunc='median').transpose()
     ax = pivot_train.plot()
 
     # bands
@@ -42,7 +41,7 @@ def get_plot(df, error=2):
                     color='blue', alpha=0.15)
 
     # scatter
-    pivot_test = pd.pivot_table(test_df, index=[test_df.index.weekofyear],
+    pivot_test = pd.pivot_table(test_df, index=[test_df.index.isocalendar().week],
                                 columns=[test_df.index.weekday, test_df.index.hour],
                                 values='free_slots')
 
@@ -68,4 +67,5 @@ def get_plot(df, error=2):
     ax.legend().remove()
 
     plt.tight_layout()
-    plt.show()
+    plt.savefig(os.path.join(saving_path, "median_plot.png"))
+    # plt.show()

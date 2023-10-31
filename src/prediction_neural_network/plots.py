@@ -5,9 +5,9 @@ from matplotlib.lines import Line2D
 from matplotlib.offsetbox import AnchoredText
 from matplotlib.ticker import MultipleLocator
 
-import neural_network.config as config
-from neural_network.data_processing import process
-from neural_network.utilities import occupancy_to_free_parking, true_pred_occ_to_free_parking
+from . import config
+from .data_processing import process
+from .utilities import occupancy_to_free_parking, true_pred_occ_to_free_parking
 
 plt.rcParams['figure.figsize'] = (10, 6)
 plt.rcParams["legend.loc"] = 'lower right'
