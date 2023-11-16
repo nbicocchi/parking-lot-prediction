@@ -17,9 +17,6 @@ from .plots import one_step_ahead_plot, multi_steps_ahead_plot
 from .prediction import prediction
 
 
-# from utilities import get_occupancy
-
-
 def tune_hyperparameters(X_train, X_test, y_train, y_test):
     model_list = list()
     print('n_timesteps_in={}, n_timesteps_out={}, n_features={}'.format(config.n_timesteps_in, config.n_timesteps_out,
@@ -48,8 +45,7 @@ def print_results(model_list):
         print('Hyperparameters: {}'.format(model_config['hyperparameters']))
         print(
             'Training metrics: epochs={n_epochs}, loss={loss:.5e}, parking_accuracy={parking_accuracy:.3f} (error=±{'
-            'error})'.format(
-                **model_config['training_metrics']))
+            'error})'.format(**model_config['training_metrics']))
         print('Testing metrics: loss={loss:.5e}, parking_accuracy={parking_accuracy:.3f} (error=±{error})'.format(
             **model_config['testing_metrics']))
 
@@ -65,6 +61,7 @@ def save_best_model(model_list, path, print_summary=True):
 
 
 def train(df, path, plot=False):
+    #dataset needs: ['time', 'percentage'] 
     data, timestamps = process(df, labels=True)
     print('Training set from {} to {}'.format(timestamps[0][0, 0], timestamps[0][-1, 0]))
     print('Testing set from {} to {}'.format(timestamps[1][0, 0], timestamps[1][-1, 0]))
@@ -74,6 +71,6 @@ def train(df, path, plot=False):
     if plot:
         test_data = (data[1], data[3])
         pred_data = prediction(best_model, *test_data, print_accuracy=True)
-        one_step_ahead_plot(timestamps[3], pred_data, data[3], hours_to_plot=150)
-        multi_steps_ahead_plot(timestamps[3], pred_data, data[3], hours_to_plot=150)
+        one_step_ahead_plot(timestamps[3], pred_data, data[3], path, hours_to_plot=168) #168 = 24 dati all'ora * 7 giorni
+        multi_steps_ahead_plot(timestamps[3], pred_data, data[3], path, hours_to_plot=168)
     return best_model

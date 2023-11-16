@@ -15,7 +15,7 @@ def occupancy_to_free_parking(occ):
 def parking_accuracy(true, pred, error=config.error):
     true_occupation = cast(config.n_sensors * true, int32)
     pred_occupation = cast(config.n_sensors * pred, int32)
-    return k.get_value(k.mean(k.abs(true_occupation - pred_occupation) <= error))
+    return k.mean(k.abs(true_occupation - pred_occupation) <= error)
 
 
 def true_pred_occ_to_free_parking(true, pred, accuracy=False):

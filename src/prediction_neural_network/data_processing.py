@@ -27,13 +27,11 @@ def split_data(df):
     train, test = train_df.values, test_df.values
     X_train, y_train = split_sequence(train)
     X_test, y_test = split_sequence(test)
-
     return X_train, X_test, y_train, y_test
 
 
 def add_weekday_hour(data):
     # DO NOT CHANGE with a def
-    print(data)
     vfunc = lambda x: np.apply_along_axis(lambda l: list(map(lambda t: (t.dayofweek, t.hour), l)), axis=1, arr=x)
     return np.dstack((vfunc(data[:, :, 0]), np.expand_dims(data[:, :, 1], axis=2)))
 
