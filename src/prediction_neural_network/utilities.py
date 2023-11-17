@@ -4,7 +4,6 @@ import pandas as pd
 import sys
 
 sys.path.append("..")
-from data_mgmt.load import get_data
 import prediction_neural_network.config as config
 
 

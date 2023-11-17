@@ -5,10 +5,10 @@ import shutil
 from datetime import datetime
 import pandas as pd
 
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {‘0’, ‘1’, ‘2’}
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' #info and messages are not printed
 pd.options.mode.chained_assignment = None
 
-from analysis.plots import charts
+from plots.data_plots import charts
 from prediction_statistical.fourier import calculate_fourier
 import prediction_statistical.median as median
 from prediction_neural_network.train import train
@@ -128,7 +128,7 @@ def myfunc(argv):
         elif opt in ("-n", "--neural_network_data"):
             flag_statistical = False
         elif opt in ("-v", "--verbose"):
-            os.environ['TF_CPP_MIN_LOG_LEVEL'] = '0'
+            os.environ['TF_CPP_MIN_LOG_LEVEL'] = '0' #restore info and messages
             pd.options.mode.chained_assignment = 'warn'
 
     if flag_parking:
@@ -154,19 +154,19 @@ def generate_data_for(parking_lot, flag_statistical, flag_neural_network):
         print('ERROR: parking lot \'{}\' doesn\'t exists into the dataset'.format(parking_lot))
         sys.exit(2)
 
+    path_plots = get_folder_path(parking_lot, 'plots')
+
     if flag_statistical:
-        path_plots = get_folder_path(parking_lot, 'plots')
+
         charts(df, path_plots)
-        median.get_plot(df, path_plots, error=3)
-        print('median accuracy (error={}) = {}'.format(3, median.get_accuracy(df, error=3)))
-        print('median accuracy (error={}) = {}'.format(4, median.get_accuracy(df, error=4)))
+        median.get_plot_and_print_accuracy(df,path_plots,3,[3,4])
         # calculating fourier passing 9 weeks, 8 for training 1 for validation 
         calculate_fourier(df, path_plots, start_fourier, end_fourier)
 
     if flag_neural_network:
         # Neural network #provare con datetime(2020, 2, 25, 0, 0, 0, 0)
         df = load_mantova_for_nn(datetime(2019, 12, 16), datetime(2020, 2, 26, 0, 0, 0, 0))
-        train(df, get_folder_path("mantova", 'neural_network'), True)
+        train(df, path_plots, get_folder_path(parking_lot, 'neural_network_build'), True)
 
 
 if __name__ == '__main__':

@@ -1,19 +1,20 @@
 import itertools
 import os
+import sys
 import traceback
 import random
-
-random.seed(42)
 import numpy as np
-
-np.random.seed(42)
 import tensorflow as tf
 
+random.seed(42)
+np.random.seed(42)
 tf.random.set_seed(42)
+
+sys.path.append("..")
 from .build_fit_model import build_fit_model
 from . import config
 from .data_processing import process
-from .plots import one_step_ahead_plot, multi_steps_ahead_plot
+from plots.neural_network_plots import one_step_ahead_plot, multi_steps_ahead_plot
 from .prediction import prediction
 
 
@@ -60,17 +61,17 @@ def save_best_model(model_list, path, print_summary=True):
     return model
 
 
-def train(df, path, plot=False):
+def train(df, path_plot, path_model, plot=False):
     #dataset needs: ['time', 'percentage'] 
     data, timestamps = process(df, labels=True)
     print('Training set from {} to {}'.format(timestamps[0][0, 0], timestamps[0][-1, 0]))
     print('Testing set from {} to {}'.format(timestamps[1][0, 0], timestamps[1][-1, 0]))
     models = tune_hyperparameters(*data)
     print_results(models)
-    best_model = save_best_model(models, path)
+    best_model = save_best_model(models, path_model)
     if plot:
         test_data = (data[1], data[3])
         pred_data = prediction(best_model, *test_data, print_accuracy=True)
-        one_step_ahead_plot(timestamps[3], pred_data, data[3], path, hours_to_plot=168) #168 = 24 dati all'ora * 7 giorni
-        multi_steps_ahead_plot(timestamps[3], pred_data, data[3], path, hours_to_plot=168)
+        one_step_ahead_plot(timestamps[3], pred_data, data[3], path_plot, hours_to_plot=168) #168 = 24 dati all'ora * 7 giorni
+        multi_steps_ahead_plot(timestamps[3], pred_data, data[3], path_plot, hours_to_plot=168)
     return best_model
