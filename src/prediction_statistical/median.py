@@ -4,7 +4,7 @@ import sys
 sys.path.append("..")
 from plots.statistical_plots import median_plot
 
-def get_accuracy(df, error=2):
+def get_accuracy(df, error):
     split_idx = int(len(df) * 0.8)
     train_df, test_df = df[:split_idx], df[split_idx:]
 
@@ -21,8 +21,10 @@ def get_accuracy(df, error=2):
                        (test_df['prediction'] > test_df['lower_bound'])]) / len(test_df)
 
 
-def get_plot_and_print_accuracy(df, path_plot, plot_error, accuracy_error: list):
-    for error in accuracy_error:
-        print('median accuracy (error=+-{}%) = {}'.format(error, get_accuracy(df, error)))
-    median_plot(df, path_plot, plot_error)
+def get_plot_and_print_accuracy(df: pd.DataFrame, path_plot: str, capacity: int, percentual_error: list):
+    #percentual_error can be max of 2 values
+    for per_error in percentual_error:
+        error = round(capacity * (per_error/100))
+        print('median accuracy [error=±{}(±{}%)] = {:.4f}'.format(error, per_error, get_accuracy(df, error)))
+    median_plot(df, path_plot, capacity, percentual_error)
 

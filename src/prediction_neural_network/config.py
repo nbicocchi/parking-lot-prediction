@@ -2,15 +2,14 @@ from datetime import datetime
 
 n_timesteps_in = 24
 n_timesteps_out = 8
-n_features = 1
-weekday_hour = True
-if weekday_hour:
-    n_features += 2
 test_size = 0.2
 validation_size = 0.2
 max_epochs = 1000
-n_sensors = 68
-error = 2
+error = 2 # piu o meno parcheggi 2 = 68*3%
+
+n_sensors = 68 #parcheggi
+
+
 start_date = datetime(2019, 12, 16, 0, 0, 0)
 end_date = datetime(2020, 2, 25, 0, 0, 0)
 hyperparameters_config = {'conv_layers': [[(60, 12)]],

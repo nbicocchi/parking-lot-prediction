@@ -3,30 +3,30 @@ import tensorflow.keras.backend as k
 import pandas as pd
 import sys
 
-sys.path.append("..")
-import prediction_neural_network.config as config
+
+def occupancy_to_free_parking(occ, capacity):
+    return cast((1 - occ) * capacity, int32).numpy().squeeze()
 
 
-def occupancy_to_free_parking(occ):
-    return cast((1 - occ) * config.n_sensors, int32).numpy().squeeze()
+def wrapper_accuracy_score(capacity, error):
+    def parking_accuracy(true, pred):
+            true_occupation = cast(capacity * true, int32)
+            pred_occupation = cast(capacity * pred, int32)
+            return k.mean(k.abs(true_occupation - pred_occupation) <= error)
+    return parking_accuracy
 
 
-def parking_accuracy(true, pred, error=config.error):
-    true_occupation = cast(config.n_sensors * true, int32)
-    pred_occupation = cast(config.n_sensors * pred, int32)
+def parking_accuracy(true, pred, capacity, error):
+    #error = number of parching lot more or less aviable
+    true_occupation = cast(capacity * true, int32)
+    pred_occupation = cast(capacity * pred, int32)
     return k.mean(k.abs(true_occupation - pred_occupation) <= error)
 
 
-def true_pred_occ_to_free_parking(true, pred, accuracy=False):
-    free_parking_true = occupancy_to_free_parking(true)
-    free_parking_pred = occupancy_to_free_parking(pred)
+def true_pred_occ_to_free_parking(true, pred, capacity, error, accuracy=False):
+    free_parking_true = occupancy_to_free_parking(true, capacity)
+    free_parking_pred = occupancy_to_free_parking(pred, capacity)
     if accuracy:
-        acc = parking_accuracy(true, pred)
+        acc = parking_accuracy(true, pred, capacity, error)
         return free_parking_true, free_parking_pred, acc
     return free_parking_true, free_parking_pred
-
-
-# def get_occupancy(path=None, park_id=None, start=None, end=None):
-#     if path:
-#         return pd.read_csv(path.joinpath('occupancy.csv'), parse_dates=['time'])
-#     return get_data(tables_names=['occupancy'], park_id=park_id, start_date=start, end_date=end)[0].reset_index()

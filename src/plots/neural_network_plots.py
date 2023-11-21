@@ -7,7 +7,6 @@ from matplotlib.offsetbox import AnchoredText
 from matplotlib.ticker import MultipleLocator
 
 sys.path.append("..")
-from prediction_neural_network import config
 from prediction_neural_network.utilities import true_pred_occ_to_free_parking
 
 plt.rcParams['figure.figsize'] = (10, 6)
@@ -30,28 +29,28 @@ def set_tickslable(ax, label):
             temp_label = ticklabels[index]
 
 
-def one_step_ahead_subplot(ax, label, pred, truth, plot_error=True):
+def one_step_ahead_subplot(ax, label, pred, truth, error, plot_error=True):
     date_label = [datetime.strftime(l, '%a %m-%d %H:%M') for l in label]
     ax.plot(date_label, pred, label='prediction',
             linestyle='--', linewidth=2, color='tab:blue')
     ax.plot(date_label, truth, label='truth', linewidth=3.5, color='tab:orange')
 
     ax.grid(which='major', color='#CCCCCC', linestyle='-')
-    if plot_error and config.error:
-        ax.fill_between(date_label, pred - config.error, pred + config.error,
+    if plot_error and error:
+        ax.fill_between(date_label, pred - error, pred + error,
                         alpha=0.2, color='tab:blue')
     ax.set_xlim(date_label[0], date_label[-1])
     # ax.legend()
     return ax
 
 
-def multi_steps_ahead_subplot(ax, multiple_label, multiple_pred, multiple_truth, plot_error=True):
+def multi_steps_ahead_subplot(ax, multiple_label, multiple_pred, multiple_truth, error, plot_error=True):
     for label, pred, truth in zip(multiple_label, multiple_pred, multiple_truth):
         date_label = [datetime.strftime(l, '%a %m-%d %H') for l in label]
         ax.plot(date_label, pred, linestyle='--', linewidth=2)
         ax.plot(date_label, truth, linestyle='-', color='tab:orange', linewidth=3.5)
-        if plot_error and config.error:
-            ax.fill_between(date_label, pred - config.error, pred + config.error,
+        if plot_error and error:
+            ax.fill_between(date_label, pred - error, pred + error,
                             alpha=0.04, color='tab:blue')
     ax.grid(which='major', color='#CCCCCC', linestyle='-')
     
@@ -68,7 +67,7 @@ def multi_steps_ahead_subplot(ax, multiple_label, multiple_pred, multiple_truth,
     return ax
 
 
-def one_step_ahead_plot(label, pred, truth, path,hours_to_plot=None):
+def one_step_ahead_plot(label, pred, truth, path, capacity, error, hours_to_plot=None):
     label = label[:, 0]
     pred = pred[:, 0]
     truth = truth[:, 0]
@@ -76,23 +75,23 @@ def one_step_ahead_plot(label, pred, truth, path,hours_to_plot=None):
         label = label[-hours_to_plot:]
         pred = pred[-hours_to_plot:]
         truth = truth[-hours_to_plot:]
-    free_parking_truth, free_parking_pred, accuracy = true_pred_occ_to_free_parking(truth, pred, accuracy=True)
-    fig, ax = build_plot(accuracy)
-    ax = one_step_ahead_subplot(ax, label, free_parking_pred, free_parking_truth)
+    free_parking_truth, free_parking_pred, accuracy = true_pred_occ_to_free_parking(truth, pred, capacity, error, accuracy=True)
+    fig, ax = build_plot(accuracy,  capacity, error)
+    ax = one_step_ahead_subplot(ax, label, free_parking_pred, free_parking_truth, error)
     set_tickslable(ax, label)
     ax.set_title('One-step-ahead prediction on test set', size=18)
     plt.savefig(os.path.join(path,'1_step_prediction.svg'), bbox_inches='tight', format='svg')
     #plt.show()
 
 
-def multi_steps_ahead_plot(label, pred, truth, path, hours_to_plot=None):
+def multi_steps_ahead_plot(label, pred, truth, path, n_timesteps_out ,capacity, error, hours_to_plot=None):
     if hours_to_plot is not None:
         #hours_to_plot -= config.n_timesteps_out
         label = label[-hours_to_plot:]
         pred = pred[-hours_to_plot:, :]
         truth = truth[-hours_to_plot:]
-    free_parking_truth, free_parking_pred, accuracy = true_pred_occ_to_free_parking(truth, pred, accuracy=True)
-    fig, ax = build_plot(accuracy)
+    free_parking_truth, free_parking_pred, accuracy = true_pred_occ_to_free_parking(truth, pred, capacity, accuracy=True)
+    fig, ax = build_plot(accuracy, capacity, error)
     ax = multi_steps_ahead_subplot(ax, label, free_parking_pred, free_parking_truth)
     set_tickslable(ax, label[:, 0])
 
@@ -100,18 +99,18 @@ def multi_steps_ahead_plot(label, pred, truth, path, hours_to_plot=None):
              Line2D([0], [0], color='orange', linewidth=3.5, linestyle='-')]
     labels = ['Predictions', 'Truth']
     ax.legend(lines, labels)
-    ax.set_title('{}-steps-ahead predictions on test set'.format(config.n_timesteps_out), size=18)
+    ax.set_title('{}-steps-ahead predictions on test set'.format(n_timesteps_out), size=18)
     plt.savefig(os.path.join(path,'8_step_prediction.svg'), bbox_inches='tight', format='svg')
 
 
-def build_plot(accuracy):
+def build_plot(accuracy, capacity, error):
     fig, ax = plt.subplots(figsize=(15, 8), sharex='col', sharey='row',
                                    gridspec_kw={'hspace': 0, 'wspace': 0})
-    accuracy_text = AnchoredText('Parking accuracy={:.2f} (with error=±{})'.format(accuracy, config.error),
+    accuracy_text = AnchoredText('Parking accuracy={:.2f} (with error=±{})'.format(accuracy, error),
                                  loc='lower left')
     ax.add_artist(accuracy_text)
     ax.set(ylabel='Free parking spot')
     ax.set(xlabel='Time')
-    ax.yaxis.set_major_locator(MultipleLocator(round(config.n_sensors / 10)))
+    ax.yaxis.set_major_locator(MultipleLocator(round(capacity / 10)))
     fig.patch.set_facecolor('xkcd:white')
     return fig, ax
