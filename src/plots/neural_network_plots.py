@@ -14,14 +14,14 @@ plt.rcParams["legend.loc"] = 'lower right'
 
 
 def set_tickslable(ax, label):
-
     ticklabels = [datetime.strftime(l,'%a %m-%d') for l in label]
     ax.set_xticklabels(ticklabels)
     xticks = ax.xaxis.get_major_ticks()
     temp_label = ''
     for index, label in enumerate(ax.get_xaxis().get_ticklabels()):
-        if index >= len(ticklabels)-1: break
-        if ticklabels[index] == temp_label or index == 0: #first date set invisibale to ger a clear timestamp on the x-axis
+        if index >= len(ticklabels): #with multilable ticklabels[index] return: list index out of range
+            xticks[index].set_visible(False)
+        elif ticklabels[index] == temp_label or index == 0:
             if index == 0: temp_label = ticklabels[index]
             label.set_visible(False)  # hide labels
             xticks[index].set_visible(False)  # hide ticks where labels are hidden
@@ -53,14 +53,6 @@ def multi_steps_ahead_subplot(ax, multiple_label, multiple_pred, multiple_truth,
             ax.fill_between(date_label, pred - error, pred + error,
                             alpha=0.04, color='tab:blue')
     ax.grid(which='major', color='#CCCCCC', linestyle='-')
-    
-    # xticks = ax.xaxis.get_major_ticks()
-    # for index, label in enumerate(ax.get_xaxis().get_ticklabels()):
-    #     if index % 24 != 0: #first date set invisibale to ger a clear timestamp on the x-axis
-    #         #print("disabilito")
-    #         label.set_visible(False)  # hide labels
-    #         xticks[index].set_visible(False)  # hide ticks where labels are hidden
-
     left = datetime.strftime(multiple_label[0, 0], '%a %m-%d %H')
     right = datetime.strftime(multiple_label[-1, -1], '%a %m-%d %H')
     ax.set_xlim(left, right)
@@ -81,7 +73,6 @@ def one_step_ahead_plot(label, pred, truth, path, capacity, error, hours_to_plot
     set_tickslable(ax, label)
     ax.set_title('One-step-ahead prediction on test set', size=18)
     plt.savefig(os.path.join(path,'1_step_prediction.svg'), bbox_inches='tight', format='svg')
-    #plt.show()
 
 
 def multi_steps_ahead_plot(label, pred, truth, path, n_timesteps_out ,capacity, error, hours_to_plot=None):
@@ -90,9 +81,9 @@ def multi_steps_ahead_plot(label, pred, truth, path, n_timesteps_out ,capacity, 
         label = label[-hours_to_plot:]
         pred = pred[-hours_to_plot:, :]
         truth = truth[-hours_to_plot:]
-    free_parking_truth, free_parking_pred, accuracy = true_pred_occ_to_free_parking(truth, pred, capacity, accuracy=True)
+    free_parking_truth, free_parking_pred, accuracy = true_pred_occ_to_free_parking(truth, pred, capacity, error, accuracy=True)
     fig, ax = build_plot(accuracy, capacity, error)
-    ax = multi_steps_ahead_subplot(ax, label, free_parking_pred, free_parking_truth)
+    ax = multi_steps_ahead_subplot(ax, label, free_parking_pred, free_parking_truth, error)
     set_tickslable(ax, label[:, 0])
 
     lines = [Line2D([0], [0], color='black', linewidth=2, linestyle='--'),
@@ -100,7 +91,7 @@ def multi_steps_ahead_plot(label, pred, truth, path, n_timesteps_out ,capacity, 
     labels = ['Predictions', 'Truth']
     ax.legend(lines, labels)
     ax.set_title('{}-steps-ahead predictions on test set'.format(n_timesteps_out), size=18)
-    plt.savefig(os.path.join(path,'8_step_prediction.svg'), bbox_inches='tight', format='svg')
+    plt.savefig(os.path.join(path,'{}_step_prediction.svg'.format(n_timesteps_out)), bbox_inches='tight', format='svg')
 
 
 def build_plot(accuracy, capacity, error):

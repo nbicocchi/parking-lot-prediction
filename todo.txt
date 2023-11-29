@@ -1,0 +1,5 @@
+-girare i grafici
+-tuning parametri portando dietro solo 1 parametro
+-controllare che i dati siano uguali
+-fare in modo automatico tutti e 4 i grafici con errori 3 e 4
+-eliminare i giorni con varianza minore al 5%

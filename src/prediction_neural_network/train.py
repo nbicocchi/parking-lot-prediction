@@ -36,7 +36,7 @@ def tune_hyperparameters(X_train, X_test, y_train, y_test, conf_nn, hyperparamet
             print('{}/{}'.format(i + 1, len(hyperparameters_combo)))
             model_metrics = build_fit_model(X_train, X_test, y_train, y_test, model_hyperparameters, conf_nn, capacity, error)
             model_list.append({'hyperparameters': model_hyperparameters, **model_metrics})
-            model_list = sorted(model_list, key=lambda p: p['testing_metrics']['parking_accuracy'], reverse=True)[:5]
+            model_list = sorted(model_list, key=lambda p: p['testing_metrics']['parking_accuracy'], reverse=True)[:1]
         except (KeyboardInterrupt, Exception):
             print()
             traceback.print_exc(limit=1)
@@ -67,8 +67,12 @@ def save_best_model(model_list, path, print_summary=True):
     return model
 
 
-def train(df, path_plot: str, path_model: str, capacity_parking_lot: int,  hyperparameters_config: dict, config_nn: dict, plot=False):
-    #dataset needs: ['time', 'percentage'] 
+def train_get_data(df, path_plot: str, path_model: str, capacity_parking_lot: int,  hyperparameters_config: dict, config_nn: dict, plot=False):
+    """
+    This function will return the best model after tuning with the best hyperparameter passed.
+    The result of every model is printed to the terminal, if plot = true plots will be generated at the given path.
+    """
+    #dataframe columns: ['time', 'percentage'] 
     data, timestamps = process_data(df, config_nn, labels=True)
     print('Training set from {} to {}'.format(timestamps[0][0, 0], timestamps[0][-1, 0]))
     print('Testing set from {} to {}'.format(timestamps[1][0, 0], timestamps[1][-1, 0]))
