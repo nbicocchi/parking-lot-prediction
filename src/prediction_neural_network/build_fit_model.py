@@ -48,7 +48,7 @@ def build_fit_model(X_train, X_test, y_train, y_test, model_hyperparameters, con
     early_stopping = EarlyStopping(monitor='parking_accuracy', mode='max',
                                    patience=10, restore_best_weights=True)
     print('{:%H:%M:%S}'.format(datetime.now()))
-    print(model_hyperparameters)
+    print("hyperparameters: ",model_hyperparameters)
     model = build_model(model_hyperparameters, conf_nn, capacity, error)
     history = model.fit(X_train, y_train,
                         validation_split=conf_nn['validation_size'], epochs=conf_nn['max_epochs'],
@@ -60,11 +60,8 @@ def build_fit_model(X_train, X_test, y_train, y_test, model_hyperparameters, con
                         'loss': last_loss,
                         'parking_accuracy': last_parking_accuracy,
                         'error': error}
-    print(
-        'TRAINING epochs={n_epochs}, loss={loss:.5e}, parking_accuracy={parking_accuracy:.3f} (error=±{error})'.format(
-            **training_metrics))
-    testing_metrics = dict(zip(['loss', 'parking_accuracy'],
-                               model.evaluate(X_test, y_test, verbose=0)))
+    print('TRAINING epochs={n_epochs}, loss={loss:.5e}, parking_accuracy={parking_accuracy:.3f} (error=±{error})'.format(**training_metrics))
+    testing_metrics = dict(zip(['loss', 'parking_accuracy'], model.evaluate(X_test, y_test, verbose=0)))
     testing_metrics['error'] = error
     print('TESTING loss={loss:.5e}, parking_accuracy={parking_accuracy:.3f} (error=±{error})'.format(**testing_metrics))
     return {'model': model, 'training_metrics': training_metrics, 'testing_metrics': testing_metrics}

@@ -17,10 +17,10 @@ from plots.neural_network_plots import one_step_ahead_plot, multi_steps_ahead_pl
 from .utilities import parking_accuracy
 
 
-def prediction(model, X, capacity, error, y=None, print_accuracy=True):
+def prediction(model, X, capacity, error, percentual_error, y=None, print_accuracy=True):
     y_pred = model.predict(X).squeeze()
     if y is not None and print_accuracy:
-        print('Network parking accuracy=', parking_accuracy(y, y_pred,  capacity, error))
+        print('Network parking accuracy [error=±{}(±{}%)] = {}'.format(error, percentual_error, parking_accuracy(y, y_pred,  capacity, error)))
     return y_pred
 
 
@@ -33,7 +33,8 @@ def tune_hyperparameters(X_train, X_test, y_train, y_test, conf_nn, hyperparamet
     for i, model_hyperparameters in enumerate(hyperparameters_combo):
         try:
             print(100 * '*')
-            print('{}/{}'.format(i + 1, len(hyperparameters_combo)))
+            if len(hyperparameters_combo) != 1:
+                print('{}/{}'.format(i + 1, len(hyperparameters_combo)))
             model_metrics = build_fit_model(X_train, X_test, y_train, y_test, model_hyperparameters, conf_nn, capacity, error)
             model_list.append({'hyperparameters': model_hyperparameters, **model_metrics})
             model_list = sorted(model_list, key=lambda p: p['testing_metrics']['parking_accuracy'], reverse=True)[:1]
@@ -76,13 +77,18 @@ def train_get_data(df, path_plot: str, path_model: str, capacity_parking_lot: in
     data, timestamps = process_data(df, config_nn, labels=True)
     print('Training set from {} to {}'.format(timestamps[0][0, 0], timestamps[0][-1, 0]))
     print('Testing set from {} to {}'.format(timestamps[1][0, 0], timestamps[1][-1, 0]))
-    error = round(capacity_parking_lot * (config_nn['percentual_error']/100))
+    
+    #tuning with minor error
+    error = round(capacity_parking_lot * (config_nn['percentual_error'][0]/100))
     models = tune_hyperparameters(*data, config_nn, hyperparameters_config, capacity_parking_lot, error)
-    print_results(models)
+    if len(models) != 1: #tune_hyperparameters will print the same if len = 1
+        print_results(models)
     best_model = save_best_model(models, path_model)
-    if plot:
-        test_data = (data[1], data[3])
-        pred_data = prediction(best_model, *test_data, capacity_parking_lot, error, print_accuracy=True)
-        one_step_ahead_plot(timestamps[3], pred_data, data[3], path_plot, capacity_parking_lot, error, hours_to_plot=168) #168 = 24 data * 7 days
-        multi_steps_ahead_plot(timestamps[3], pred_data, data[3], path_plot, config_nn['n_timesteps_out'], capacity_parking_lot, error, hours_to_plot=168)
-    return best_model
+    best_hyperparameter = models[0]['hyperparameters']
+    for percentual_error in config_nn['percentual_error']:
+        error = round(capacity_parking_lot * (percentual_error/100))  
+        if plot:
+            pred_data = prediction(best_model, data[1], capacity_parking_lot, error, percentual_error, y=data[3], print_accuracy=True)
+            one_step_ahead_plot(timestamps[3], pred_data, data[3], path_plot, capacity_parking_lot, error, percentual_error,hours_to_plot=168) #168 = 24 data * 7 days
+            multi_steps_ahead_plot(timestamps[3], pred_data, data[3], path_plot, config_nn['n_timesteps_out'], capacity_parking_lot, error, percentual_error,hours_to_plot=168)
+    return best_hyperparameter

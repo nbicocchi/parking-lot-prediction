@@ -2,12 +2,11 @@ import json
 import os
 import sys
 import getopt
-import shutil
 from datetime import datetime
-import numpy as np
+from matplotlib import pyplot as plt
 import pandas as pd
 
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' #info, messages aren't printed
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' #info and general messages aren't printed
 pd.options.mode.chained_assignment = None
 
 from plots.data_plots import charts
@@ -24,60 +23,54 @@ birmingham_parks = ['BHMBCCMKT01', 'BHMBCCPST01', 'BHMBCCSNH01', 'BHMBCCTHL01', 
                     'Others-CCCPS202',
                     'Others-CCCPS8', 'Others-CCCPS98', 'Shopping']
 #configuration for neural network - if weekday_hour = True than n_features = 3, otherwise n_features = 1
-general_config_nn = {'n_timesteps_in': 24,'n_timesteps_out': 8, 'weekday_hour': True,'n_features': 3, 'test_size': 0.2, 'validation_size': 0.2, 'max_epochs': 1000, 'percentual_error': 3}
+general_config_nn = {'n_timesteps_in': 24,'n_timesteps_out': 8, 'weekday_hour': True,'n_features': 3, 'test_size': 0.2, 'validation_size': 0.2, 'max_epochs': 1000, 'percentual_error': [3,4]}
 
-base_hyperparameters_config = {'conv_layers': [[(60, 6)], [(60, 12)], [(120, 6)], [(120, 12)],
-                                          [(60, 3), (120, 6)], [(60, 6), (120, 6)]],
-                          'fc_layers': [[400, 400], [200, 200, 200], [300, 300, 300], [400, 400, 400],[400, 300, 200], [300, 200, 100]],
-                          'dropout_rate': [0.04],
-                          'lstm_layers': [[], [1000]]}
+base_hyperparameters_config = {'conv_layers': [[(60, 3)], [(60, 6)], [(60, 12)], [(120, 6)]],
+                               'fc_layers': [[200, 200, 200], [300, 300, 300], [400, 400, 400],[400, 300, 200], [300, 200, 100]],
+                               'dropout_rate': [0.04, 0.08],
+                               'lstm_layers': [[1000]]}
 
 
-def load_mantova(start_date, end_date, for_neural_network =False):
-    """
-    Neural network needs only time and occupancy/percentage data with frequancy of one hour, without indexing.
-    """
+def load_mantova(start_date, end_date):
     df = pd.read_csv(os.path.join(os.getcwd(), 'src', 'dataset', 'mantova.csv'),parse_dates=['time'])
     df = df[(df['time'] >= start_date) & (df['time'] < end_date)]
     #renaming to have same column name as birmingham
+    
+    df.index = df.time
+    df.index.name = None
+    
     df['occupancy'] = df['percentage']
-
+    df['free_slots'] = 68 - df['occupancy'] * 68 #number of sensors in the parking lot
+    
+    df = df.resample(rule='1H').mean()
+    
+    df.drop(columns='time', inplace=True)
     df.drop(columns='percentage', inplace=True)
     df.drop(columns='park_id', inplace=True)
-    if not for_neural_network:
-        df.index = df.time
-        df.index.name = None
-        df.drop(columns='time', inplace=True)
-        df['free_slots'] = 68 - df['occupancy'] * 68 #number of sensors in the parking lot
-    else:
-        df = df[::12]
     return df
 
 
-def load_birmingham(park, for_neural_network = False):
-    pd.set_option('display.max_rows', None)
+def load_birmingham(park):
+    #pd.set_option('display.max_rows', None)
     df = pd.read_csv(os.path.join(os.getcwd(), 'src', 'dataset', 'birmingham.csv'), parse_dates=['LastUpdated'])
     df = df[df['SystemCodeNumber'].str.contains(park)]
     df = df.drop_duplicates(subset='LastUpdated', keep='first')
+
     df.index = df.LastUpdated
     df.index.name = None
+  
     df = df.asfreq(freq='1H', method='bfill')
-    
-    
-    if not for_neural_network:
-        df['free_slots'] = df['Capacity'] - df['Occupancy']
-    else:
-        df['time'] = df.index
-        df = df.reset_index(drop=True)
+    df['free_slots'] = df['Capacity'] - df['Occupancy']
     df['occupancy'] = df['Occupancy'] / df['Capacity']
-    print(df.groupby(by=df.index.dt.date)['occupancy'].transform('var'))
-    df['var'] = df.groupby(by=df.index.dt.date)['occupancy'].transform('var')
-    #print(df)
+    df['var'] = df.groupby(by=df.index.date)['occupancy'].transform('var')
+    
+    df = df[df['var'] != 0]
 
     df.drop(columns='LastUpdated', inplace=True)
     df.drop(columns='Capacity', inplace=True)
     df.drop(columns='Occupancy', inplace=True)
     df.drop(columns='SystemCodeNumber', inplace=True)
+    df.drop(columns='var', inplace=True)
     #print(df)
     return df
 
@@ -98,6 +91,12 @@ def get_folder_path(parking, folder):
         os.makedirs(os.path.join(path, path_parking))
     return path_parking
 
+
+def check_data(df):
+    #df = df[::12]
+    df = df[df.index > datetime(2016,12,12)]
+    df.plot(y='occupancy', kind='line')	
+    plt.savefig('analysis.svg')
 
 def myfunc(argv):
     flag_parking = False
@@ -140,29 +139,36 @@ def myfunc(argv):
 
     if not flag_statistical and not flag_create_chart and not flag_neural_network:
         flag_statistical = flag_create_chart = flag_neural_network = True
+
     config_dict = read_config_file()
-    if arg_parking not in config_dict.keys():
+    
+    if flag_parking and arg_parking not in config_dict.keys():
         print('ERROR: parking lot \'{}\' isn\'t in config.json'.format(arg_parking))
         sys.exit(2)
+
     if flag_parking:
+        print('*' * 100)
         generate_data_for(arg_parking, config_dict.get(arg_parking), flag_create_chart, flag_statistical, flag_neural_network)
     else:
         generate_data_for_every_parking_lot(config_dict,flag_create_chart, flag_statistical, flag_neural_network)
-    print('*' * 100)
+    
 
 
 def generate_data_for_every_parking_lot(config_dict: dict,flag_create_chart: bool, flag_statistical: bool, flag_neural_network: bool):
     birmingham_parks.insert(0,'mantova')
+    counter :int = 1
     for parking in birmingham_parks:
+        print(f"\n{'=' * 40} {counter}/{len(birmingham_parks)} parking lot: {parking} {'=' * 40}\n")
         generate_data_for(parking, config_dict.get(parking), flag_create_chart, flag_statistical, flag_neural_network)
+        counter+=1
 
 
-def get_df(parking_id: str, parking_config: dict, for_neural_network: bool):
+def get_df(parking_id: str, parking_config: dict):
     df = pd.DataFrame
     if parking_id == 'mantova':
-        df = load_mantova(parking_config['start_date'], parking_config['end_date'], for_neural_network)
+        df = load_mantova(parking_config['start_date'], parking_config['end_date'])
     elif parking_id in birmingham_parks:
-        df = load_birmingham(parking_id, for_neural_network)
+        df = load_birmingham(parking_id)
     else:
         print('ERROR: parking lot \'{}\' doesn\'t exists into the dataset'.format(parking_id))
         sys.exit(2)
@@ -170,27 +176,45 @@ def get_df(parking_id: str, parking_config: dict, for_neural_network: bool):
 
 
 def generate_data_for(parking_id: str, parking_config: dict, flag_create_chart: bool, flag_statistical: bool, flag_neural_network: bool):
-    df = get_df(parking_id, parking_config, False)
-    path_plots = get_folder_path(parking_id, 'plots')
-    print('*' * 100,'\nparking lot: ', parking_id )
-
+    df = get_df(parking_id, parking_config)
+    path_plots = get_folder_path(parking_id, '')
+    #check_data(df) 
     if flag_create_chart:
         charts(df, path_plots)
-        print('charts generated at path: {}'.format(path_plots))
+        print(f'charts generated at path: {path_plots}\n')
 
     if flag_statistical:
         median.get_plot_and_print_accuracy(df,path_plots,parking_config['capacity'],[3,4])
-        #for better resoult in fourier analysis mantova needs data frequency of one hour 
-        if parking_id == 'mantova':
-            df = df[::12]
         calculate_fourier(df, path_plots, parking_config['capacity'],[3,4])
 
     if flag_neural_network:
-        df = get_df(parking_id, parking_config, True)
-        if parking_config['hyperparameters_config'] is None:
-                parking_config['hyperparameters_config'] = base_hyperparameters_config
-        model = train_get_data(df, path_plots, get_folder_path(parking_id, 'neural_network_build'), parking_config['capacity'], parking_config['hyperparameters_config'], general_config_nn, plot=True)
-        print(model)
+        if parking_config['hyperparameters_config'] is None: #then find the best parameters and save them
+            best_hp = train_get_data(df, path_plots, get_folder_path(parking_id, 'neural_network_build'), parking_config['capacity'], base_hyperparameters_config, general_config_nn, plot=True)
+            update_config_file(parking_id, best_hp)
+        else:   
+            print("\nGetting neural network data with lstm")
+            path = get_folder_path(parking_id, 'neural_network_WITH_lstm_build')
+            train_get_data(df, path, path, parking_config['capacity'], parking_config['hyperparameters_config'], general_config_nn, plot=True)
+            parking_config['hyperparameters_config']['lstm_layers'] = [[]]
+            print("\nGetting neural network data without lstm")
+            path = get_folder_path(parking_id, 'neural_network_NO_lstm_build')
+            train_get_data(df, path, path, parking_config['capacity'], parking_config['hyperparameters_config'], general_config_nn, plot=True)
+
+
+def update_config_file(parking_id: str, bast_hyperparameters: dict):
+    print("Updating config file")
+    path = os.path.join('src','config.json')
+    with open(path, 'r') as file:
+            json_config = json.load(file)
+    #transform string to dict
+    hyperparameters = {} 
+    for key, item in bast_hyperparameters.items():
+        hyperparameters[key] = [item]
+    json_config[parking_id]['hyperparameters_config'] = hyperparameters
+
+    with open(path, 'w') as file:
+        file.write(json.dumps(json_config, indent=4))
+
 
 def read_config_file():
     """
@@ -200,8 +224,8 @@ def read_config_file():
     json_config = {}
     path = os.path.join('src','config.json')
     if os.path.exists(path):
-        with open(path, 'r') as openfile:
-            json_config = json.load(openfile)
+        with open(path, 'r') as file:
+            json_config = json.load(file)
     else:
         json_config = create_config_file()
 
@@ -229,7 +253,7 @@ def create_config_file():
             "hyperparameters_config": {'conv_layers': [[(60, 12)]],
                                         'fc_layers': [[400, 400, 400]],
                                         'dropout_rate': [0.04],
-                                        'lstm_layers': [[], [1000]]}
+                                        'lstm_layers': [[1000]]}
             }
     df = pd.read_csv(os.path.join(os.getcwd(), 'src', 'dataset', 'birmingham.csv'))    
     for parking in birmingham_parks:
@@ -248,4 +272,3 @@ def create_config_file():
 
 if __name__ == '__main__':
     myfunc(sys.argv)
-

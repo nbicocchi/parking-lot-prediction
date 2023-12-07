@@ -35,7 +35,7 @@ def calculate_fourier(df: pd.DataFrame, saving_path: str, capacity: int, percent
     """
     Given start_date and end_date fourier will be calculated on the given interval, otherwise on the entire dataset.
     A plot figure will be generated at the saving_path given.
-    MSE and accuracy according to the percentual errors given.
+    MSE and accuracy will be printed according to the percentual errors given.
     """
     if(start_date is not None and end_date is not None):
         df = df[(df.index >= start_date) & (df.index <= end_date)]

@@ -1,6 +1,7 @@
 import calendar
 import os
 from datetime import timedelta
+import matplotlib
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib import ticker
@@ -20,10 +21,9 @@ def occupancy_plot(df, path_saving_chart):
     """
     days = 30
     df = df[(df.index <= (df.index[0] + timedelta(days=days)))]
-    df = df.resample(rule='1H').mean()
-    df.reset_index(inplace=True)
-    df.drop(columns=['index'], inplace=True)
     
+    #df = df.resample(rule='1H').mean()
+    df.reset_index(inplace=True)
     ax = df.plot(y='occupancy', use_index=True)
     ax.xaxis.set_major_locator(ticker.MultipleLocator(24))
     ax.set_xticklabels(range(-1,days+1))
@@ -32,7 +32,12 @@ def occupancy_plot(df, path_saving_chart):
     ax.set_xlabel('Days')
     ax.grid(which='minor', color='#CCCCCC', linestyle=':')
     ax.grid(which='major', color='#CCCCCC', linestyle=':')
-    ax.set_ylim(bottom=0, top=1)
+
+    bottom = df['occupancy'].min() - 0.1
+    top = df['occupancy'].max() + 0.1
+    if bottom < 0: bottom = 0
+    if top > 1: top = 1
+    ax.set_ylim(bottom=bottom, top=top)
     ax.set_xlim(left=0, right=days*24)
     ax.get_legend().remove()
     plt.tight_layout()
@@ -86,3 +91,4 @@ def charts(df, path_saving_chart):
     occupancy_plot(df, path_saving_chart)
     free_parking_hour_plot(df, path_saving_chart)
     free_parking_week_boxplot(df, path_saving_chart)
+    matplotlib.pyplot.close()

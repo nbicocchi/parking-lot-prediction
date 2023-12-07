@@ -2,12 +2,13 @@ from datetime import datetime
 import os
 import sys
 from matplotlib import pyplot as plt
+import matplotlib
 from matplotlib.lines import Line2D
 from matplotlib.offsetbox import AnchoredText
 from matplotlib.ticker import MultipleLocator
 
 sys.path.append("..")
-from prediction_neural_network.utilities import true_pred_occ_to_free_parking
+from prediction_neural_network.utilities import true_pred_occ_parking
 
 plt.rcParams['figure.figsize'] = (10, 6)
 plt.rcParams["legend.loc"] = 'lower right'
@@ -59,7 +60,7 @@ def multi_steps_ahead_subplot(ax, multiple_label, multiple_pred, multiple_truth,
     return ax
 
 
-def one_step_ahead_plot(label, pred, truth, path, capacity, error, hours_to_plot=None):
+def one_step_ahead_plot(label, pred, truth, path, capacity, error, percentual_error, hours_to_plot=None):
     label = label[:, 0]
     pred = pred[:, 0]
     truth = truth[:, 0]
@@ -67,23 +68,23 @@ def one_step_ahead_plot(label, pred, truth, path, capacity, error, hours_to_plot
         label = label[-hours_to_plot:]
         pred = pred[-hours_to_plot:]
         truth = truth[-hours_to_plot:]
-    free_parking_truth, free_parking_pred, accuracy = true_pred_occ_to_free_parking(truth, pred, capacity, error, accuracy=True)
+    occ_parking_truth, occ_parking_pred, accuracy = true_pred_occ_parking(truth, pred, capacity, error, accuracy=True)
     fig, ax = build_plot(accuracy,  capacity, error)
-    ax = one_step_ahead_subplot(ax, label, free_parking_pred, free_parking_truth, error)
+    ax = one_step_ahead_subplot(ax, label, occ_parking_pred, occ_parking_truth, error)
     set_tickslable(ax, label)
     ax.set_title('One-step-ahead prediction on test set', size=18)
-    plt.savefig(os.path.join(path,'1_step_prediction.svg'), bbox_inches='tight', format='svg')
+    plt.savefig(os.path.join(path,'1_step_prediction_{}.svg'.format(percentual_error)), bbox_inches='tight', format='svg')
 
 
-def multi_steps_ahead_plot(label, pred, truth, path, n_timesteps_out ,capacity, error, hours_to_plot=None):
+def multi_steps_ahead_plot(label, pred, truth, path, n_timesteps_out ,capacity, error, percentual_error,hours_to_plot=None):
     if hours_to_plot is not None:
         #hours_to_plot -= config.n_timesteps_out
         label = label[-hours_to_plot:]
         pred = pred[-hours_to_plot:, :]
         truth = truth[-hours_to_plot:]
-    free_parking_truth, free_parking_pred, accuracy = true_pred_occ_to_free_parking(truth, pred, capacity, error, accuracy=True)
+    occ_parking_truth, occ_parking_pred, accuracy = true_pred_occ_parking(truth, pred, capacity, error, accuracy=True)
     fig, ax = build_plot(accuracy, capacity, error)
-    ax = multi_steps_ahead_subplot(ax, label, free_parking_pred, free_parking_truth, error)
+    ax = multi_steps_ahead_subplot(ax, label, occ_parking_pred, occ_parking_truth, error)
     set_tickslable(ax, label[:, 0])
 
     lines = [Line2D([0], [0], color='black', linewidth=2, linestyle='--'),
@@ -91,16 +92,17 @@ def multi_steps_ahead_plot(label, pred, truth, path, n_timesteps_out ,capacity, 
     labels = ['Predictions', 'Truth']
     ax.legend(lines, labels)
     ax.set_title('{}-steps-ahead predictions on test set'.format(n_timesteps_out), size=18)
-    plt.savefig(os.path.join(path,'{}_step_prediction.svg'.format(n_timesteps_out)), bbox_inches='tight', format='svg')
+    plt.savefig(os.path.join(path,'{}_step_prediction_{}.svg'.format(n_timesteps_out,percentual_error)), bbox_inches='tight', format='svg')
 
 
 def build_plot(accuracy, capacity, error):
+    matplotlib.pyplot.close()
     fig, ax = plt.subplots(figsize=(15, 8), sharex='col', sharey='row',
                                    gridspec_kw={'hspace': 0, 'wspace': 0})
     accuracy_text = AnchoredText('Parking accuracy={:.2f} (with error=±{})'.format(accuracy, error),
                                  loc='lower left')
     ax.add_artist(accuracy_text)
-    ax.set(ylabel='Free parking spot')
+    ax.set(ylabel='Occupancy parking spot')
     ax.set(xlabel='Time')
     ax.yaxis.set_major_locator(MultipleLocator(round(capacity / 10)))
     fig.patch.set_facecolor('xkcd:white')

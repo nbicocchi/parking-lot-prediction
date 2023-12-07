@@ -64,6 +64,9 @@ def get_timestamps(X_train, y_train, X_test, y_test):
 
 
 def process_data(df, config_nn,labels=False):
+    #set the dataframe with column time and occupancy only
+    df = df.rename_axis('time').reset_index()
+    df.drop(columns='free_slots', inplace=True)
     if labels:
         return process_data_with_labels(df, config_nn)
     return process_data_without_labels(df, config_nn)
