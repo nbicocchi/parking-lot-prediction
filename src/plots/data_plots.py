@@ -42,6 +42,7 @@ def occupancy_plot(df, path_saving_chart):
     ax.get_legend().remove()
     plt.tight_layout()
     plt.savefig(os.path.join(path_saving_chart, 'occupancy_plot.png'))
+    matplotlib.pyplot.close()
 
 
 def free_parking_hour_plot(df, path_saving_chart):
@@ -57,6 +58,7 @@ def free_parking_hour_plot(df, path_saving_chart):
     ax.grid(which='major', color='#CCCCCC', linestyle='-')
     ax.legend(loc='upper right')
     plt.savefig(os.path.join(path_saving_chart, 'free_parking_hour_plot.png'))
+    matplotlib.pyplot.close()
 
 
 def free_parking_week_boxplot(df, path_saving_chart, error=0):
@@ -85,10 +87,10 @@ def free_parking_week_boxplot(df, path_saving_chart, error=0):
 
     plt.tight_layout()
     plt.savefig(os.path.join(path_saving_chart, 'free_parking_week_boxplot.png'))
+    matplotlib.pyplot.close()
 
 
 def charts(df, path_saving_chart):
     occupancy_plot(df, path_saving_chart)
     free_parking_hour_plot(df, path_saving_chart)
     free_parking_week_boxplot(df, path_saving_chart)
-    matplotlib.pyplot.close()

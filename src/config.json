@@ -14,9 +14,9 @@
             ],
             "fc_layers": [
                 [
-                    400,
-                    400,
-                    400
+                    300,
+                    300,
+                    300
                 ]
             ],
             "dropout_rate": [
@@ -68,19 +68,19 @@
                 [
                     [
                         60,
-                        3
+                        6
                     ]
                 ]
             ],
             "fc_layers": [
                 [
-                    200,
-                    200,
-                    200
+                    100,
+                    100,
+                    100
                 ]
             ],
             "dropout_rate": [
-                0.08
+                0.04
             ],
             "lstm_layers": [
                 [
@@ -397,8 +397,8 @@
             "conv_layers": [
                 [
                     [
-                        60,
-                        3
+                        120,
+                        6
                     ]
                 ]
             ],
@@ -410,7 +410,7 @@
                 ]
             ],
             "dropout_rate": [
-                0.04
+                0.08
             ],
             "lstm_layers": [
                 [
@@ -428,19 +428,19 @@
                 [
                     [
                         60,
-                        3
+                        6
                     ]
                 ]
             ],
             "fc_layers": [
                 [
-                    200,
-                    200,
+                    400,
+                    300,
                     200
                 ]
             ],
             "dropout_rate": [
-                0.04
+                0.08
             ],
             "lstm_layers": [
                 [
@@ -574,10 +574,29 @@
         "start_date": null,
         "end_date": null,
         "hyperparameters_config": {
-            "conv_layers": [[[60,12]]],
-            "fc_layers": [[200,200,200]],
-            "dropout_rate": [0.04],
-            "lstm_layers": [[1000]]
+            "conv_layers": [
+                [
+                    [
+                        60,
+                        3
+                    ]
+                ]
+            ],
+            "fc_layers": [
+                [
+                    300,
+                    200,
+                    100
+                ]
+            ],
+            "dropout_rate": [
+                0.04
+            ],
+            "lstm_layers": [
+                [
+                    1000
+                ]
+            ]
         }
     },
     "NIA North": {
@@ -618,20 +637,20 @@
             "conv_layers": [
                 [
                     [
-                        120,
-                        6
+                        60,
+                        3
                     ]
                 ]
             ],
             "fc_layers": [
                 [
-                    200,
-                    200,
+                    400,
+                    300,
                     200
                 ]
             ],
             "dropout_rate": [
-                0.08
+                0.04
             ],
             "lstm_layers": [
                 [
@@ -709,19 +728,18 @@
                 [
                     [
                         60,
-                        12
+                        3
                     ]
                 ]
             ],
             "fc_layers": [
                 [
-                    300,
-                    300,
-                    300
+                    400,
+                    200
                 ]
             ],
             "dropout_rate": [
-                0.08
+                0.04
             ],
             "lstm_layers": [
                 [
@@ -738,20 +756,20 @@
             "conv_layers": [
                 [
                     [
-                        60,
-                        3
+                        120,
+                        12
                     ]
                 ]
             ],
             "fc_layers": [
                 [
-                    300,
-                    300,
-                    300
+                    100,
+                    100,
+                    100
                 ]
             ],
             "dropout_rate": [
-                0.04
+                0.08
             ],
             "lstm_layers": [
                 [
@@ -783,7 +801,11 @@
             "dropout_rate": [
                 0.08
             ],
-            "lstm_layers": [[1000]]
+            "lstm_layers": [
+                [
+                    1000
+                ]
+            ]
         }
     },
     "Others-CCCPS8": {
@@ -824,20 +846,20 @@
             "conv_layers": [
                 [
                     [
-                        60,
-                        12
+                        120,
+                        6
                     ]
                 ]
             ],
             "fc_layers": [
                 [
-                    300,
-                    200,
+                    100,
+                    100,
                     100
                 ]
             ],
             "dropout_rate": [
-                0.08
+                0.04
             ],
             "lstm_layers": [
                 [

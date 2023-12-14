@@ -74,6 +74,7 @@ def one_step_ahead_plot(label, pred, truth, path, capacity, error, percentual_er
     set_tickslable(ax, label)
     ax.set_title('One-step-ahead prediction on test set', size=18)
     plt.savefig(os.path.join(path,'1_step_prediction_{}.svg'.format(percentual_error)), bbox_inches='tight', format='svg')
+    matplotlib.pyplot.close()
 
 
 def multi_steps_ahead_plot(label, pred, truth, path, n_timesteps_out ,capacity, error, percentual_error,hours_to_plot=None):
@@ -93,10 +94,10 @@ def multi_steps_ahead_plot(label, pred, truth, path, n_timesteps_out ,capacity, 
     ax.legend(lines, labels)
     ax.set_title('{}-steps-ahead predictions on test set'.format(n_timesteps_out), size=18)
     plt.savefig(os.path.join(path,'{}_step_prediction_{}.svg'.format(n_timesteps_out,percentual_error)), bbox_inches='tight', format='svg')
+    matplotlib.pyplot.close()
 
 
 def build_plot(accuracy, capacity, error):
-    matplotlib.pyplot.close()
     fig, ax = plt.subplots(figsize=(15, 8), sharex='col', sharey='row',
                                    gridspec_kw={'hspace': 0, 'wspace': 0})
     accuracy_text = AnchoredText('Parking accuracy={:.2f} (with error=±{})'.format(accuracy, error),

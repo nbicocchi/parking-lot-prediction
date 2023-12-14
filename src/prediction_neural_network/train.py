@@ -5,7 +5,8 @@ import traceback
 import random
 import numpy as np
 import tensorflow as tf
-
+from keras import backend as K
+from multiprocessing import Queue
 random.seed(42)
 np.random.seed(42)
 tf.random.set_seed(42)
@@ -24,6 +25,15 @@ def prediction(model, X, capacity, error, percentual_error, y=None, print_accura
     return y_pred
 
 
+def clear_session(model_list, n):
+    """ 
+    prevent memory growht and set model_list size to n
+    """
+    if len(model_list)> n:
+        model_list[-1].clear()
+        del model_list[-1]
+        K.clear_session()
+
 def tune_hyperparameters(X_train, X_test, y_train, y_test, conf_nn, hyperparameters_config, capacity, error):
     model_list = list()
     print('n_timesteps_in={}, n_timesteps_out={}, n_features={}'.format(conf_nn['n_timesteps_in'], conf_nn['n_timesteps_out'],
@@ -37,7 +47,8 @@ def tune_hyperparameters(X_train, X_test, y_train, y_test, conf_nn, hyperparamet
                 print('{}/{}'.format(i + 1, len(hyperparameters_combo)))
             model_metrics = build_fit_model(X_train, X_test, y_train, y_test, model_hyperparameters, conf_nn, capacity, error)
             model_list.append({'hyperparameters': model_hyperparameters, **model_metrics})
-            model_list = sorted(model_list, key=lambda p: p['testing_metrics']['parking_accuracy'], reverse=True)[:1]
+            model_list = sorted(model_list, key=lambda p: p['testing_metrics']['parking_accuracy'], reverse=True)
+            clear_session(model_list, 3)
         except (KeyboardInterrupt, Exception):
             print()
             traceback.print_exc(limit=1)
@@ -68,7 +79,7 @@ def save_best_model(model_list, path, print_summary=True):
     return model
 
 
-def train_get_data(df, path_plot: str, path_model: str, capacity_parking_lot: int,  hyperparameters_config: dict, config_nn: dict, plot=False):
+def train_get_data(df, path_plot: str, path_model: str, capacity_parking_lot: int,  hyperparameters_config: dict, config_nn: dict, queue: Queue = None, plot=False):
     """
     This function will return the best model after tuning with the best hyperparameter passed.
     The result of every model is printed to the terminal, if plot = true plots will be generated at the given path.
@@ -80,9 +91,10 @@ def train_get_data(df, path_plot: str, path_model: str, capacity_parking_lot: in
     
     #tuning with minor error
     error = round(capacity_parking_lot * (config_nn['percentual_error'][0]/100))
+
     models = tune_hyperparameters(*data, config_nn, hyperparameters_config, capacity_parking_lot, error)
-    if len(models) != 1: #tune_hyperparameters will print the same if len = 1
-        print_results(models)
+    
+    print_results(models)
     best_model = save_best_model(models, path_model)
     best_hyperparameter = models[0]['hyperparameters']
     for percentual_error in config_nn['percentual_error']:
@@ -91,4 +103,7 @@ def train_get_data(df, path_plot: str, path_model: str, capacity_parking_lot: in
             pred_data = prediction(best_model, data[1], capacity_parking_lot, error, percentual_error, y=data[3], print_accuracy=True)
             one_step_ahead_plot(timestamps[3], pred_data, data[3], path_plot, capacity_parking_lot, error, percentual_error,hours_to_plot=168) #168 = 24 data * 7 days
             multi_steps_ahead_plot(timestamps[3], pred_data, data[3], path_plot, config_nn['n_timesteps_out'], capacity_parking_lot, error, percentual_error,hours_to_plot=168)
+    if queue is not None:
+        queue.put(best_hyperparameter)
+        return 1
     return best_hyperparameter

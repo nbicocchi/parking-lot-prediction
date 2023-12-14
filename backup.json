@@ -1,0 +1,332 @@
+{
+    "mantova": {
+        "capacity": 68,
+        "start_date": "2019-12-16 0:0:0",
+        "end_date": "2020-2-26 0:0:0",
+        "hyperparameters_config": {
+            "conv_layers": [[[60,12]]],
+            "fc_layers": [[400,400,400]],
+            "dropout_rate": [0.04],
+            "lstm_layers": [[1000]]
+        }
+    },
+    "BHMBCCMKT01": {
+        "capacity": 577,
+        "start_date": null,
+        "end_date": null,
+        "hyperparameters_config": {
+            "conv_layers": [[[60,6]]],
+            "fc_layers": [[400,300,200]],
+            "dropout_rate": [0.04],
+            "lstm_layers": [[1000]]
+        }
+    },
+    "BHMBCCPST01": {
+        "capacity": 317,
+        "start_date": null,
+        "end_date": null,
+        "hyperparameters_config": {
+            "conv_layers": [[[60,6]]],
+            "fc_layers": [[100,100,100]],
+            "dropout_rate": [0.04],
+            "lstm_layers": [[1000]]
+        }
+    },
+    "BHMBCCSNH01": {
+        "capacity": 863,
+        "start_date": null,
+        "end_date": null,
+        "hyperparameters_config": {
+            "conv_layers": [[[60,6]]],
+            "fc_layers": [[300,200,100]],
+            "dropout_rate": [0.04],
+            "lstm_layers": [[1000]]
+        }
+    },
+    "BHMBCCTHL01": {
+        "capacity": 387,
+        "start_date": null,
+        "end_date": null,
+        "hyperparameters_config": {
+            "conv_layers": [[[60,3]]],
+            "fc_layers": [[300,300,300]],
+            "dropout_rate": [0.04],
+            "lstm_layers": [[1000]]
+        }
+    },
+    "BHMBRCBRG01": {
+        "capacity": 1010,
+        "start_date": null,
+        "end_date": null,
+        "hyperparameters_config": {
+            "conv_layers": [[[60,12]]],
+            "fc_layers": [[300,300,300]],
+            "dropout_rate": [0.04],
+            "lstm_layers": [[1000]]
+        }
+    },
+    "BHMBRCBRG02": {
+        "capacity": 1194,
+        "start_date": null,
+        "end_date": null,
+        "hyperparameters_config": {
+            "conv_layers": [[[60,12]]],
+            "fc_layers": [[400,300,200]],
+            "dropout_rate": [0.08],
+            "lstm_layers": [[1000]]
+        }
+    },
+    "BHMBRCBRG03": {
+        "capacity": 849,
+        "start_date": null,
+        "end_date": null,
+        "hyperparameters_config": {
+            "conv_layers": [[[120,6]]],
+            "fc_layers": [[200,200,200]],
+            "dropout_rate": [0.08],
+            "lstm_layers": [[1000]]
+        }
+    },
+    "BHMEURBRD01": {
+        "capacity": 470,
+        "start_date": null,
+        "end_date": null,
+        "hyperparameters_config": {
+            "conv_layers": [[[60,3]]],
+            "fc_layers": [[400,300,200]],
+            "dropout_rate": [0.04],
+            "lstm_layers": [[1000]]
+        }
+    },
+    "BHMEURBRD02": {
+        "capacity": 220,
+        "start_date": null,
+        "end_date": null,
+        "hyperparameters_config": {
+            "conv_layers": [[[120,6]]],
+            "fc_layers": [[200,200,200]],
+            "dropout_rate": [0.08],
+            "lstm_layers": [[1000]]
+        }
+    },
+    "BHMMBMMBX01": {
+        "capacity": 687,
+        "start_date": null,
+        "end_date": null,
+        "hyperparameters_config": {
+            "conv_layers": [[[60,6]]],
+            "fc_layers": [[300,200,100]],
+            "dropout_rate": [0.08],
+            "lstm_layers": [[1000]]
+        }
+    },
+    "BHMNCPHST01": {
+        "capacity": 1200,
+        "start_date": null,
+        "end_date": null,
+        "hyperparameters_config": {
+            "conv_layers": [[[60,12]]],
+            "fc_layers": [[400,400,400]],
+            "dropout_rate": [0.04],
+            "lstm_layers": [[1000]]
+        }
+    },
+    "BHMNCPLDH01": {
+        "capacity": 720,
+        "start_date": null,
+        "end_date": null,
+        "hyperparameters_config": {
+            "conv_layers": [[[60,3]]],
+            "fc_layers": [[300,200,100]],
+            "dropout_rate": [0.04],
+            "lstm_layers": [[1000]]
+        }
+    },
+    "BHMNCPNHS01": {
+        "capacity": 500,
+        "start_date": null,
+        "end_date": null,
+        "hyperparameters_config": {
+            "conv_layers": [[[60,3]]],
+            "fc_layers": [[200,200,200]],
+            "dropout_rate": [0.04],
+            "lstm_layers": [[1000]]
+        }
+    },
+    "BHMNCPNST01": {
+        "capacity": 485,
+        "start_date": null,
+        "end_date": null,
+        "hyperparameters_config": {
+            "conv_layers": [[[60,3]]],
+            "fc_layers": [[200,200,200]],
+            "dropout_rate": [0.04],
+            "lstm_layers": [[1000]]
+        }
+    },
+    "BHMNCPPLS01": {
+        "capacity": 450,
+        "start_date": null,
+        "end_date": null,
+        "hyperparameters_config": {
+            "conv_layers": [[[60,3]]],
+            "fc_layers": [[200,200,200]],
+            "dropout_rate": [0.04],
+            "lstm_layers": [[1000]]
+        }
+    },
+    "BHMNCPRAN01": {
+        "capacity": 600,
+        "start_date": null,
+        "end_date": null,
+        "hyperparameters_config": {
+            "conv_layers": [[[120,6]]],
+            "fc_layers": [[400,300,200]],
+            "dropout_rate": [0.08],
+            "lstm_layers": [[1000]]
+        }
+    },
+    "Broad Street": {
+        "capacity": 690,
+        "start_date": null,
+        "end_date": null,
+        "hyperparameters_config": {
+            "conv_layers": [[[60,3]]],
+            "fc_layers": [[300,300,300]],
+            "dropout_rate": [0.04],
+            "lstm_layers": [[1000]]
+        }
+    },
+    "Bull Ring": {
+        "capacity": 3053,
+        "start_date": null,
+        "end_date": null,
+        "hyperparameters_config": {
+            "conv_layers": [[[60,6]]],
+            "fc_layers": [[300,300,300]],
+            "dropout_rate": [0.08],
+            "lstm_layers": [[1000]]
+        }
+    },
+    "NIA Car Parks": {
+        "capacity": 1268,
+        "start_date": null,
+        "end_date": null,
+        "hyperparameters_config": {
+            "conv_layers": [[[60,12]]],
+            "fc_layers": [[200,200,200]],
+            "dropout_rate": [0.04],
+            "lstm_layers": [[1000]]
+        }
+    },
+    "NIA North": {
+        "capacity": 480,
+        "start_date": null,
+        "end_date": null,
+        "hyperparameters_config": {
+            "conv_layers": [[[60,12]]],
+            "fc_layers": [[300,200,100]],
+            "dropout_rate": [0.08],
+            "lstm_layers": [[1000]]
+        }
+    },
+    "NIA South": {
+        "capacity": 788,
+        "start_date": null,
+        "end_date": null,
+        "hyperparameters_config": {
+            "conv_layers": [[[ 120,6]]],
+            "fc_layers": [[200,200,200]],
+            "dropout_rate": [0.08],
+            "lstm_layers": [[1000]]
+        }
+    },
+    "Others-CCCPS105a": {
+        "capacity": 2009,
+        "start_date": null,
+        "end_date": null,
+        "hyperparameters_config": {
+            "conv_layers": [[[120,6]]],
+            "fc_layers": [[300,200,100]],
+            "dropout_rate": [0.04],
+            "lstm_layers": [[1000]]
+        }
+    },
+    "Others-CCCPS119a": {
+        "capacity": 2803,
+        "start_date": null,
+        "end_date": null,
+        "hyperparameters_config": {
+            "conv_layers": [[[120,6]]],
+            "fc_layers": [[300,300,300]],
+            "dropout_rate": [0.08],
+            "lstm_layers": [[1000]]
+        }
+    },
+    "Others-CCCPS133": {
+        "capacity": 4675,
+        "start_date": null,
+        "end_date": null,
+        "hyperparameters_config": {
+            "conv_layers": [[[60,12]]],
+            "fc_layers": [[300,300,300]],
+            "dropout_rate": [0.08],
+            "lstm_layers": [[1000]]
+        }
+    },
+    "Others-CCCPS135a": {
+        "capacity": 3883,
+        "start_date": null,
+        "end_date": null,
+        "hyperparameters_config": {
+            "conv_layers": [[[60,3]]],
+            "fc_layers": [[300,300,300]],
+            "dropout_rate": [0.04],
+            "lstm_layers": [[1000]]
+        }
+    },
+    "Others-CCCPS202": {
+        "capacity": 2937,
+        "start_date": null,
+        "end_date": null,
+        "hyperparameters_config": {
+            "conv_layers": [[[60,6]]],
+            "fc_layers": [[300,200,100]],
+            "dropout_rate": [0.08],
+            "lstm_layers": [[1000]]
+        }
+    },
+    "Others-CCCPS8": {
+        "capacity": 1322,
+        "start_date": null,
+        "end_date": null,
+        "hyperparameters_config": {
+            "conv_layers": [[[60,3]]],
+            "fc_layers": [[400,300,200]],
+            "dropout_rate": [0.04],
+            "lstm_layers": [[1000]]
+        }
+    },
+    "Others-CCCPS98": {
+        "capacity": 3103,
+        "start_date": null,
+        "end_date": null,
+        "hyperparameters_config": {
+            "conv_layers": [[[60,6]]],
+            "fc_layers": [[400,300]],
+            "dropout_rate": [ 0.08],
+            "lstm_layers": [[1000]]
+        }
+    },
+    "Shopping": {
+        "capacity": 1920,
+        "start_date": null,
+        "end_date": null,
+        "hyperparameters_config": {
+            "conv_layers": [[[60,12]]],
+            "fc_layers": [[300,200,100]],
+            "dropout_rate": [0.08],
+            "lstm_layers": [[1000]]
+        }
+    }
+}
