@@ -1,0 +1,5 @@
+/auth.yaml
+/ptnetsuite_chain.crt
+*.pyc
+.idea/*
+.ipynb_checkpoints/*
